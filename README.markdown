@@ -78,7 +78,118 @@ Remember that the ```module``` argument will be appended to the controller name 
 
 ### Resources
 
-_Documentation will be available soon._
+Most of the time, resources that you make available through your Wheels application will need similar actions associated with them: `index`, `new`, `create`, `edit`, `update`, `delete`, and `show`. Setting up a controller as a _resource_ automatically sets up a group of routes as hooks into these common actions.
+
+To take it a step further, the resource that you configure will respond to a sensible combination of URL patterns and HTTP verbs (`GET`, `POST`, `PUT`, and `DELETE`).
+
+#### Simple Example: `users` Resource
+
+An example makes this concept easier to understand. Let's set up the `users` controller as a resource. This single call will enable the standard CRUD operations on your `users` controller. Use the `resources()` function in `config/routes.cfm` like so:
+
+```coldfusion
+drawRoutes()
+	.resources("users")
+.end();
+```
+
+Adding a resource in this way will create routes similar to this:
+
+<table>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Method</th>
+			<th>Pattern</th>
+			<th>Controller</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><code>users</code></td>
+			<td><code>GET</code></td>
+			<td><code>/users</code></td>
+			<td><code>users</code></td>
+			<td><code>index</code></td>
+		</tr>
+		<tr>
+			<td><code>users</code></td>
+			<td><code>POST</code></td>
+			<td><code>/users</code></td>
+			<td><code>users</code></td>
+			<td><code>create</code></td>
+		</tr>
+		<tr>
+			<td><code>newUser</code></td>
+			<td><code>GET</code></td>
+			<td><code>/users/new</code></td>
+			<td><code>users</code></td>
+			<td><code>new</code></td>
+		</tr>
+		<tr>
+			<td><code>editUser</code></td>
+			<td><code>GET</code></td>
+			<td><code>/users/[key]/edit</code></td>
+			<td><code>users</code></td>
+			<td><code>edit</code></td>
+		</tr>
+		<tr>
+			<td><code>user</code></td>
+			<td><code>GET</code></td>
+			<td><code>/users/[key]</td>
+			<td><code>users</code></td>
+			<td><code>show</code></td>
+		</tr>
+		<tr>
+			<td><code>user</code></td>
+			<td><code>PUT</code></td>
+			<td><code>/users/[key]</code></td>
+			<td><code>users</code></td>
+			<td><code>update</code></td>
+		</tr>
+		<tr>
+			<td><code>user</code></td>
+			<td><code>DELETE</code></td>
+			<td><code>/users/[key]</code></td>
+			<td><code>users</code></td>
+			<td><code>delete</code></td>
+		</tr>
+	</tbody>
+</table>
+
+Now your Wheels app is ready to respond to the standard CRUD routes, and a number of helpers are made available to your controllers and views.
+
+  * `usersPath()` returns `/users`
+  * `newUserPath()` returns `/users/new`
+  * `editUserPath(params.key)` returns `/users/[key]/edit`
+  * `userPath(params.key)` returns `/users/[key]`
+
+You can then use these new helpers as the `href` argument in standard Wheels view helpers:
+
+```coldfusion
+#linkTo(text="New User", href=newUserPath())# 
+```
+
+See the _View Helpers_ section below for more information on using these helpers in forms and hyperlinks.
+
+### Singular Resources
+
+There may be some cases where your resource's URL representation would make sense being represented in a singular fashion. The above example assumes a URL for manipulating several resources, i.e., there is more than one user that will ultimately be recorded in the system.
+
+Let's say that you want for the `profile` resource to represent a signed-in user's profile. The user is only concerned with a single profile: his or hers. It wouldn't make sense for this resource to be represented in a plural sense (e.g., `profiles`).
+
+Setting the resource up as a singular word (e.g., `profile`) is similar, but you use the `resource()` function instead of `resources()`:
+
+```coldfusion
+drawRoutes()
+	.resources("users")
+	.resource("profile")
+.end();
+```
+
+### Nested Resources
+
+
 
 ## View Helpers
 
@@ -126,6 +237,7 @@ Or, using the ColdRoute ```linkTo``` overrides:
 __Note:__ This can be greatly improved through the use of resources, which will be covered in the future.
 
 ```coldfusion
+<cfscript>
 drawRoutes()
 
 	// administration side
@@ -151,6 +263,7 @@ drawRoutes()
 	.wildcard()
 	.root(to="blog##index")
 .end();
+</cfscript>
 ```
 
 This would create the following routes:
